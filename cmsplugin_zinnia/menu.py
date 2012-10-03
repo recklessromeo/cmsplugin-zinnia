@@ -126,9 +126,43 @@ class EntryModifier(Modifier):
                 node.visible = False
         return nodes
 
+class CustomZinniaMenu(CMSAttachMenu):
+    """Menu for the tags"""
+    name = _('Zinnia Custom Menu')
+
+    def get_nodes(self, request):
+        """Return menu's node for Custom"""
+        nodes = []
+        nodes.append(NavigationNode(_('Categories'),
+            reverse('zinnia_category_list'),
+            'categories'))
+
+        archives = []
+        attributes = {'hidden': False}
+
+        for entry in Entry.published.all():
+            year = entry.creation_date.strftime('%Y')
+            month = entry.creation_date.strftime('%m')
+            month_text = format(entry.creation_date, 'b').capitalize()
+            day = entry.creation_date.strftime('%d')
+
+            key_archive_year = 'year-%s' % year
+            key_archive_month = 'month-%s-%s' % (year, month)
+            key_archive_day = 'day-%s-%s-%s' % (year, month, day)
+
+            if not key_archive_year in archives:
+                nodes.append(NavigationNode(
+                    year, reverse('zinnia_entry_archive_year', args=[year]),
+                    key_archive_year, attr=attributes))
+                archives.append(key_archive_year)
+
+        return nodes
+
+
 
 menu_pool.register_menu(EntryMenu)
 menu_pool.register_menu(CategoryMenu)
 menu_pool.register_menu(AuthorMenu)
 menu_pool.register_menu(TagMenu)
 menu_pool.register_modifier(EntryModifier)
+menu_pool.register_menu(CustomZinniaMenu)

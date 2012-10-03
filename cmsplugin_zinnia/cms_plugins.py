@@ -31,11 +31,12 @@ class CMSLatestEntriesPlugin(CMSPluginBase):
     filter_horizontal = ['categories', 'authors', 'tags']
     fieldsets = (
         (None, {'fields': ('number_of_entries',
-                           'template_to_render')}),
+                           'template_to_render','ordering' )}),
         (_('Filters'), {'fields': (('categories', 'subcategories'),
                                    'authors', 'tags'),
                         'classes': ('collapse',)}),)
     text_enabled = True
+    admin_preview = False#dm
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         """Filtering manytomany field"""
@@ -63,7 +64,8 @@ class CMSLatestEntriesPlugin(CMSPluginBase):
         if instance.tags.count():
             entries = TaggedItem.objects.get_union_by_model(
                 entries, instance.tags.all())
-
+        if instance.ordering:# dm
+            pass   #entries.order_by(instance.ordering)
         entries = entries.distinct()
         if instance.number_of_entries:
             entries = entries[:instance.number_of_entries]

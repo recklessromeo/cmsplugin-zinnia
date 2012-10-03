@@ -15,9 +15,17 @@ from cmsplugin_zinnia.settings import PLUGINS_TEMPLATES
 
 TEMPLATES = [('cmsplugin_zinnia/entry_list.html', _('Entry list (default)')),
              ('cmsplugin_zinnia/entry_detail.html', _('Entry detailed')),
+             ('cmsplugin_zinnia/entry_detail_faq.html', _('Entry FAQ')),#dm
              ('cmsplugin_zinnia/entry_slider.html', _('Entry slider'))] + \
              PLUGINS_TEMPLATES
-
+#dm
+ARTICLEORDERING = [ ('title', _('Entry Title Ascendant')),
+                    ('-title', _('Entry Title Descendant')),
+                    ('title_sort', _('Entry Natural Title Ascendant')),
+                    ('-title_sort', _('Entry Natural Title Descendant')),
+                    ('creation_date', _('Entry Creation Date')),
+                    ('-creation_date', _('Entry Last Date'))
+                  ]
 
 class LatestEntriesPlugin(CMSPlugin):
     """CMS Plugin for displaying latest entries"""
@@ -40,6 +48,8 @@ class LatestEntriesPlugin(CMSPlugin):
         _('template'), blank=True,
         max_length=250, choices=TEMPLATES,
         help_text=_('template used to display the plugin'))
+
+    ordering = models.CharField( _('ordering'), choices=ARTICLEORDERING , blank=True, null=True, max_length=255, help_text=_('optional ordering '))
 
     @property
     def render_template(self):

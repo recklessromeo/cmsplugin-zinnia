@@ -1,8 +1,34 @@
 {% load i18n %}
-{% for entry in entries %}
-  {% with object=entry object_content=entry.html_content|truncatewords_html:100|safe continue_reading=1 %}
-  {% include "zinnia/_entry_detail.html" %}
-  {% endwith %}
-{% empty %}
-  <p class="notice">{% trans "No entries yet." %}</p>
-{% endfor %}
+{% if object.ordering %}
+    {% comment %}{{ object.ordering|first }}{% endcomment %}
+    {% if object.ordering|first != '-' %}
+        {% for entry in entries|dictsort:object.ordering %}
+          {% with object=entry object_content=entry.html_content_hr_excerpt|truncatewords_html:150|safe continue_reading=1 %}
+              {% include "zinnia/_entry_detail.html" %}
+          {% endwith %}
+         {% empty %}
+         <p class="notice">{% trans "No entries yet." %}</p>
+        {% endfor %}
+    {% else %}
+        {% with revordered=object.ordering|slice:"1:" %}
+            {% for entry in entries|dictsortreversed:revordered %}
+                {% with object=entry object_content=entry.html_content_hr_excerpt|truncatewords_html:150|safe continue_reading=1 %}
+                    {% include "zinnia/_entry_detail.html" %}
+                {% endwith %}
+            {% empty %}
+                <p class="notice">{% trans "No entries yet." %}</p>
+        {% endfor %}
+        {% endwith %}
+    {% endif %}
+
+{% else %}
+    {% for entry in entries %}
+        {% with object=entry object_content=entry.html_content_hr_excerpt|truncatewords_html:150|safe continue_reading=1 %}
+            {% comment %}{% include "zinnia/_entry_detail.html" %}{% endcomment %}
+            <h3>{{ object.title }}</h3>
+            {{ object_content }}
+        {% endwith %}
+    {% empty %}
+        <p class="notice">{% trans "No entries yet." %}</p>
+    {% endfor %}
+{% endif %}
